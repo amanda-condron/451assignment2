@@ -2,6 +2,7 @@
 
 // #include "memwatch.h"
 #include <stdlib.h>
+#include <stdio.h>
 
 
 static char *cr = "copyright (c) David Binkley 2021";
