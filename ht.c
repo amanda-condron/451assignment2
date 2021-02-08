@@ -1,33 +1,43 @@
 #include "ht.h"
+#include "list.h"
+
 
 #include "misc.h"
 #include <stdio.h>
 #include <stdlib.h>
 
-struct sHashtable
+
+struct sHashTable
 {
-    void * list;
+    tList* lists;
+    bool (*compare_function)();
+    int(*hash_function)()
 
 }sHashTable;
 
-#define LIST_SIZE (sizeof(struct sHashtable))
+#define TABLE_SIZE (sizeof(struct sHashTable))
+
+#define LIST_SIZE (sizeof(struct tList))
 
 
 /* purpose: initialize the hashtable
  * input: an int, compare that returns an int, hash function to place int in hashtable 
  * output:  a hashtable
  */
-tHashTable ht_initialize(int i, int (*compare_function)(), int(*hash_function)())
+tHashTable ht_initialize(int i, bool (*compare_function)(), int(*hash_function)())
 {
-    sHashtable table;
+    tHashTable table;
 
-    table = (sHashtable) check_malloc(LIST_SIZE);
-    
-    // takes in int it which is the size of the table (that has arrays as indexes)
+    table = (tHashTable)check_malloc(TABLE_SIZE);
+    //table->lists = (tList)check_malloc(LIST_SIZE);
 
-    // takes in compare function
+    table->hash_function = hash_function;
+    table->compare_function = compare_function;
 
-    // takes in hash function that will has the thingy and return an int saying where to be placed in the table
+    for( int j = 0; j <= i; j++)
+    {
+        list_initialize(table->lists[j]);
+    }
 }
 
 /* purpose: 
@@ -35,8 +45,16 @@ tHashTable ht_initialize(int i, int (*compare_function)(), int(*hash_function)()
  * output:  nothing
  */
 void ht_free(tHashTable table)
-{
+{   
+    if( table == NULL )
+        return;
 
+    for( int i = 0; i <= TABLE_SIZE; i++)
+    {
+        list_free(table->lists[i]);
+    }
+    //free the overall list as a whole
+    free(table);
 }
 
 /* purpose: 
@@ -45,7 +63,19 @@ void ht_free(tHashTable table)
  */
 tHashTable ht_insert(tHashTable table, void* value)
 {
+    tHashTable table = table;
 
+    // set i to the hash value that is retrieved
+    int i = table->hash_function(value);
+
+    //loop through the hashtable to find the matching index/bucket
+    for( int j = 0; j <= i; j++)
+    {
+        //if the bucket matches insert the value in
+        if(j == i)
+            list_insert_beginning(table->lists[j], value);
+
+    }
 }
 
 /* purpose: 
@@ -54,7 +84,7 @@ tHashTable ht_insert(tHashTable table, void* value)
  */
 tHashTable ht_delete(tHashTable table, void* value)
 {
-
+    
 }
 
 /* purpose: 
